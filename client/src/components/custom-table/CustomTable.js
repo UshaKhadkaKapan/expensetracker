@@ -1,24 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Form, Table } from "react-bootstrap";
 import { deleteTransactions, getTransactions } from "../../helpers/axiosHelper";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchTransactionsAction } from "../../pages/dashboard/dahboard.action";
 
 export const CustomTable = () => {
-  const [transactions, setTransactions] = useState([]);
+  // const [transactions, setTransactions] = useState([]);
+  const dispatch = useDispatch();
+  const { transactions } = useSelector((state) => state.dashboard);
   const [ids, setIds] = useState([]);
   const [resp, setResp] = useState({});
 
   useEffect(() => {
     //call fuction to call api to feth all the transactions
-    fetchTransactions();
+    dispatch(fetchTransactionsAction());
   }, []);
-
-  const fetchTransactions = async () => {
-    // let's call axios to fetch all the transactions
-    const data = await getTransactions();
-    if (data.status === "success") {
-      setTransactions(data.result);
-    }
-  };
 
   const handleOnCheck = (e) => {
     const { checked, value } = e.target;
@@ -44,7 +40,9 @@ export const CustomTable = () => {
 
     // call api
     const result = await deleteTransactions(ids);
-    result.status === "success" && fetchTransactions() && setIds([]);
+    result.status === "success" &&
+      dispatch(fetchTransactionsAction()) &&
+      setIds([]);
     setResp(result);
     ///TODO: if satus is success then refetch the transactions
   };
